@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Tính Cữ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .toggle-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .large-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 150px;
+            height: 50px;
+        }
+        .large-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .large-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 25px;
+        }
+        .large-slider:before {
+            position: absolute;
+            content: "";
+            height: 40px;
+            width: 40px;
+            left: 5px;
+            bottom: 5px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .large-slider {
+            background-color: #2196F3;
+        }
+        input:checked + .large-slider:before {
+            transform: translateX(100px);
+        }
+        .tab-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .container {
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        input[type="time"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .small-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 30px;
+            height: 17px;
+        }
+        .small-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .small-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 17px;
+        }
+        .small-slider:before {
+            position: absolute;
+            content: "";
+            height: 13px;
+            width: 13px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .small-slider {
+            background-color: #2196F3;
+        }
+        input:checked + .small-slider:before {
+            transform: translateX(13px);
+        }
+        @media (max-width: 768px) {
+            .tab-container {
+                display: block;
+            }
+            .container {
+                display: none;
+                width: 100%;
+            }
+            .container.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Nút chuyển đổi giữa hai tab -->
+    <div class="toggle-container">
+        <label class="large-toggle-switch">
+            <input type="checkbox" id="toggle-tab" onchange="toggleTab()">
+            <span class="large-slider"></span>
+        </label>
+    </div>
+
+    <!-- Bảng dữ liệu -->
+    <div class="tab-container">
+        <!-- Tab Cữ Vắt Sữa -->
+        <div id="milk-pump-tab" class="container active">
+            <h2>Bảng Tính Cữ Vắt Sữa</h2>
+            <label for="start-time-pump">Thời gian bắt đầu (cữ 1):</label>
+            <input type="time" id="start-time-pump" value="09:00" onchange="updateFirstTime('pump')"><br><br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cữ số</th>
+                        <th>Thời gian ăn</th>
+                        <th>
+                            Khoảng cách
+                            <br>
+                            <label class="small-toggle-switch">
+                                <input type="checkbox" id="toggle-all-pump" onchange="toggleAll('pump')">
+                                <span class="small-slider"></span>
+                            </label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-table-pump"></tbody>
+            </table>
+        </div>
+
+        <!-- Tab Cữ Ăn Sữa -->
+        <div id="milk-feed-tab" class="container">
+            <h2>Bảng Tính Cữ Ăn Sữa Của Bơ</h2>
+            <label for="start-time-feed">Thời gian bắt đầu (cữ 1):</label>
+            <input type="time" id="start-time-feed" value="09:00" onchange="updateFirstTime('feed')"><br><br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cữ số</th>
+                        <th>Thời gian ăn</th>
+                        <th>
+                            Khoảng cách
+                            <br>
+                            <label class="small-toggle-switch">
+                                <input type="checkbox" id="toggle-all-feed" onchange="toggleAll('feed')">
+                                <span class="small-slider"></span>
+                            </label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-table-feed"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function initializeTable(tableId) {
+            const table = document.getElementById(tableId);
+            for (let i = 1; i <= 6; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}</td>
+                    <td><input type="time" id="${tableId}-time-${i}" onchange="calculate('${tableId.split('-')[2]}', ${i})"></td>
+                    <td>
+                        ${i < 6 ? `
+                            <span>3h30</span>
+                            <label class="small-toggle-switch">
+                                <input type="checkbox" id="${tableId}-toggle-${i}" onchange="calculate('${tableId.split('-')[2]}')">
+                                <span class="small-slider"></span>
+                            </label>
+                            <span>4h</span>
+                        ` : '-'}
+                    </td>
+                `;
+                table.appendChild(row);
+            }
+        }
+
+        function updateFirstTime(type) {
+            const startTimeInput = document.getElementById(`start-time-${type}`);
+            const firstTimeInput = document.getElementById(`schedule-table-${type}-time-1`);
+            firstTimeInput.value = startTimeInput.value;
+            calculate(type, 1);
+        }
+
+        function calculate(type, fromIndex = 1) {
+            const tableId = `schedule-table-${type}`;
+            let currentTime = new Date(`1970-01-01T${document.getElementById(`${tableId}-time-${fromIndex}`).value}:00`);
+
+            for (let i = fromIndex + 1; i <= 6; i++) {
+                const timeInput = document.getElementById(`${tableId}-time-${i}`);
+                const toggle = document.getElementById(`${tableId}-toggle-${i - 1}`);
+                const interval = toggle && toggle.checked ? 240 : 210; // 240 phút (4 giờ) hoặc 210 phút (3 giờ 30 phút)
+                currentTime.setMinutes(currentTime.getMinutes() + interval);
+                timeInput.value = currentTime.toTimeString().substring(0, 5);
+            }
+        }
+
+        function toggleAll(type) {
+            const tableId = `schedule-table-${type}`;
+            const toggleAll = document.getElementById(`toggle-all-${type}`).checked;
+            for (let i = 1; i < 6; i++) {
+                const toggle = document.getElementById(`${tableId}-toggle-${i}`);
+                if (toggle) {
+                    toggle.checked = toggleAll;
+                }
+            }
+            calculate(type, 1);
+        }
+
+        function toggleTab() {
+            const isChecked = document.getElementById('toggle-tab').checked;
+            const pumpTab = document.getElementById('milk-pump-tab');
+            const feedTab = document.getElementById('milk-feed-tab');
+
+            if (window.innerWidth <= 768) {
+                pumpTab.classList.toggle('active', !isChecked);
+                feedTab.classList.toggle('active', isChecked);
+            }
+        }
+
+        initializeTable('schedule-table-pump');
+        initializeTable('schedule-table-feed');
+        updateFirstTime('pump');
+        updateFirstTime('feed');
+    </script>
+</body>
+</html>
