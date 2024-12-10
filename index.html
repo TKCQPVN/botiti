@@ -20,45 +20,54 @@
             align-items: center;
             margin: 20px 0;
         }
+		
+		
         .large-toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 150px;
-            height: 50px;
-        }
-        .large-toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .large-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 25px;
-        }
-        .large-slider:before {
-            position: absolute;
-            content: "";
-            height: 40px;
-            width: 40px;
-            left: 5px;
-            bottom: 5px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .large-slider {
-            background-color: #2196F3;
-        }
-        input:checked + .large-slider:before {
-            transform: translateX(100px);
-        }
+			position: relative;
+			display: inline-block;
+			width: 100px; /* Giảm kích thước */
+			height: 40px; /* Giảm kích thước */
+		}
+
+		.large-toggle-switch input {
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.large-slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #f44336; /* Mặc định: Đỏ */
+			transition: .4s;
+			border-radius: 20px;
+		}
+
+		.large-slider:before {
+			position: absolute;
+			content: "";
+			height: 30px; /* Giảm kích thước */
+			width: 30px; /* Giảm kích thước */
+			left: 5px;
+			bottom: 5px;
+			background-color: white;
+			transition: .4s;
+			border-radius: 50%;
+		}
+
+		input:checked + .large-slider {
+			background-color: #4caf50; /* Trạng thái bật: Xanh lá cây */
+		}
+
+		input:checked + .large-slider:before {
+			transform: translateX(60px); /* Điều chỉnh khoảng cách trượt */
+		}
+		
+		
         .tab-container {
             display: flex;
             width: 100%;
